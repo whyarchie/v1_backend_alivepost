@@ -1,0 +1,7 @@
+model progress {
+    id         Int      @id @default(autoincrement())
+    diseasesid Int
+    diseases   diseases @relation(fields: [diseasesid], references: [id])
+    createdAt  DateTime @default(now())
+    updatedAt  DateTime @updatedAt
+}

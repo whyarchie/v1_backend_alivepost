@@ -1,0 +1,11 @@
+model medicines {
+    id           Int             @id @default(autoincrement())
+    name         String
+    dosage       String
+    type         String
+    manufacturer String
+    description  String
+    prescription prescriptions[]
+    createdAt    DateTime        @default(now())
+    updatedAt    DateTime        @updatedAt
+}

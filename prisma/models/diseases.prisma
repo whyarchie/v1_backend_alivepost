@@ -1,0 +1,12 @@
+model diseases {
+    id           Int             @id @default(autoincrement())
+    name         String
+    patientId    Int
+    patient      patients        @relation(fields: [patientId], references: [id])
+    doctorId     Int
+    doctor       Doctor          @relation(fields: [doctorId], references: [id])
+    prescription prescriptions[]
+    progress     progress[]
+    createdAt    DateTime        @default(now())
+    updatedAt    DateTime        @updatedAt
+}

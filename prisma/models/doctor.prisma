@@ -1,0 +1,12 @@
+model Doctor {
+    id         Int        @id @default(autoincrement())
+    name       String
+    speciality String
+    phone      String
+    hospitalId Int
+    hospital   hospital   @relation(fields: [hospitalId], references: [id])
+    password   String
+    createdAt  DateTime   @default(now())
+    updatedAt  DateTime   @updatedAt
+    diseases   diseases[]
+}

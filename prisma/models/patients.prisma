@@ -1,0 +1,13 @@
+model patients {
+    id            Int             @id @default(autoincrement())
+    name          String
+    phone         String
+    age           Int
+    bloodgroup    String
+    address       String
+    diseases      diseases[]
+    prescriptions prescriptions[]
+
+    createdAt DateTime @default(now())
+    updatedAt DateTime @updatedAt
+}
