@@ -13,9 +13,9 @@ model Patient {
 }
 
 enum Gender {
-  male
-  female
-  others
+  MALE
+  FEMALE
+  OTHER
 }
 model MedicalHistory {
   id          Int       @id @default(autoincrement())
