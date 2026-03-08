@@ -31,3 +31,14 @@ export async function DiseaseSearchService(value: string) {
     throw new AppError("Unexpected error while searching diseases", 500);
   }
 }
+export async function DiseaseDataByIdService(id: number) {
+  const disease = await prisma.disease.findUnique({
+    where: { id }
+  });
+
+  if (!disease) {
+    throw new AppError("Disease not found", 404);
+  }
+
+  return disease;
+}

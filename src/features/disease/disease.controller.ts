@@ -1,6 +1,6 @@
 import express from "express";
 import { diseaseSchema, type DiseaseCreateSchema } from "./disease.schema";
-import { CreateDisease, DiseaseSearchService } from "./disease.service";
+import { CreateDisease, DiseaseDataByIdService, DiseaseSearchService } from "./disease.service";
 
 const diseaseRouter = express.Router();
 
@@ -29,4 +29,17 @@ diseaseRouter.get("/search", async (req, res, next) => {
     next(error);
   }
 });
+diseaseRouter.get("/",async (req , res , next)=>{
+  try{
+      const StringId = req.query.id as string
+      const id = parseInt(StringId)
+      const data = await DiseaseDataByIdService(id)
+      res.status(200).json({
+        success: true,
+        data: data
+      })
+  }catch(error){
+    next(error)
+  }
+})
 export default diseaseRouter;
