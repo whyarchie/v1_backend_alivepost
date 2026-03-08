@@ -1,5 +1,5 @@
 
 interface AuthUserType{
-    userId: string,
+    id: string,
     role: 'Patient' | "Doctor" | "Hospital" |"Admin"  
 }

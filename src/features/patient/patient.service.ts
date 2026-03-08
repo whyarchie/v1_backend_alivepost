@@ -34,7 +34,7 @@ export async function LoginPatient(data: PatientLoginInput) {
   if (patient.dateOfBirth.toISOString() !== data.dateOfBirth.toISOString()) {
     throw new AppError(error.INVALID_CREDENTIALS, 401);
   }
-  const token = jwt.sign({ id: patient.id }, process.env.JWT_SECRET!, {
+  const token = jwt.sign({ id: patient.id ,role: "Patient" }, process.env.JWT_SECRET!, {
     expiresIn: "14d",
   });
   return { patient, token };
