@@ -45,20 +45,23 @@ patientRouter.post("/login", async (req, res, next) => {
   }
 });
 
-//Patient Delete  --- this can be security issue fix this
-patientRouter.delete('/delete',AuthUser, async (req,res , next)=>{
-  try{
-    const id = req.user?.id
-    const data = await DeletePatientService(id)
-    console.log(data)
-    res.status(200).json({
-      success:true,
-      data:data
-    })
-  }catch(error){
-    next(error)
+//Patient Delete
+patientRouter.delete("/delete", AuthUser, async (req, res, next) => {
+  try {
+    const userInfo = req.user;
+    if (userInfo?.role == "Patient") {
+      const id = userInfo?.id;
+      const data = await DeletePatientService(id);
+      console.log(data);
+      res.status(200).json({
+        success: true,
+        data: data,
+      });
+    }
+  } catch (error) {
+    next(error);
   }
-})
+});
 //Medical History create
 patientRouter.post("/medicalhistorycreate", async (req, res, next) => {
   const data: MedicalHistoryCreate = req.body;
@@ -74,53 +77,50 @@ patientRouter.post("/medicalhistorycreate", async (req, res, next) => {
   }
 });
 
-//Create Patient Condition 
-patientRouter.post('/condition',AuthUser,async (req, res, next) => {
-    try {
-      const data = req.body;
-      const user = req.user;
+//Create Patient Condition
+patientRouter.post("/condition", AuthUser, async (req, res, next) => {
+  try {
+    const data = req.body;
+    const user = req.user;
 
-      // Validate input data
-      const safeData = PatientConditionSchema.parse(data);
+    // Validate input data
+    const safeData = PatientConditionSchema.parse(data);
 
-      // Determine patient ID based on user role
-      let patientId: number | null = null;
-      if (user?.role === "Patient") {
-        patientId = user.id;
-      } else if (user?.role === "Hospital" || user?.role === "Doctor") {
-        patientId = safeData.patientId;
-      } else {
-        return res.status(403).json({
-          success: false,
-          message: "Unauthorized: Invalid user role",
-        });
-      }
-
-      // Ensure patientId is valid
-      if (!patientId) {
-        return res.status(400).json({
-          success: false,
-          message: "Invalid patient ID",
-        });
-      }
-
-      // Create patient condition
-      const patientCondition = await PatientConditionCreate({
-        id: patientId,
-        data: safeData, // Pass safeData as `data` instead of `safeData`
+    // Determine patient ID based on user role
+    let patientId: number | null = null;
+    if (user?.role === "Patient") {
+      patientId = user.id;
+    } else if (user?.role === "Hospital" || user?.role === "Doctor") {
+      patientId = safeData.patientId;
+    } else {
+      return res.status(403).json({
+        success: false,
+        message: "Unauthorized: Invalid user role",
       });
-
-      // Success response
-      res.status(201).json({
-        success: true,
-        data: patientCondition,
-      });
-
-    } catch (error) {
-      next(error);
     }
-  }
-);
 
+    // Ensure patientId is valid
+    if (!patientId) {
+      return res.status(400).json({
+        success: false,
+        message: "Invalid patient ID",
+      });
+    }
+
+    // Create patient condition
+    const patientCondition = await PatientConditionCreate({
+      id: patientId,
+      data: safeData, // Pass safeData as `data` instead of `safeData`
+    });
+
+    // Success response
+    res.status(201).json({
+      success: true,
+      data: patientCondition,
+    });
+  } catch (error) {
+    next(error);
+  }
+});
 
 export default patientRouter;
