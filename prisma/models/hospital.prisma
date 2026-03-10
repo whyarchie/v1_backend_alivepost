@@ -6,6 +6,7 @@ model Hospital {
     userId         String   @unique
     password       String
     doctor         Doctor[]
+    patientCondition    PatientCondition[]
     createdAt      DateTime @default(now())
     updatedAt      DateTime @updatedAt
 }
@@ -15,6 +16,7 @@ model Doctor {
     name       String
     hospitalId Int
     hospital   Hospital @relation(fields: [hospitalId], references: [id], onDelete: Cascade )
+    patientConditions PatientCondition[]
     createdAt  DateTime @default(now())
     updatedAt  DateTime @updatedAt
 }

@@ -2,6 +2,9 @@
 CREATE TYPE "DiseaseType" AS ENUM ('CHRONIC', 'ACUTE');
 
 -- CreateEnum
+CREATE TYPE "DosageForm" AS ENUM ('TABLET', 'CAPSULE', 'SYRUP', 'INJECTION', 'OINTMENT', 'DROPS', 'CREAM', 'GEL', 'INHALER', 'POWDER');
+
+-- CreateEnum
 CREATE TYPE "Gender" AS ENUM ('MALE', 'FEMALE', 'OTHER');
 
 -- CreateEnum
@@ -50,9 +53,9 @@ CREATE TABLE "Medicine" (
     "id" SERIAL NOT NULL,
     "brandName" TEXT NOT NULL,
     "genericName" TEXT NOT NULL,
-    "dosageForm" TEXT NOT NULL,
+    "dosageForm" "DosageForm" NOT NULL,
     "dosageStrength" TEXT,
-    "Manufacturer" TEXT NOT NULL,
+    "manufacturer" TEXT NOT NULL,
 
     CONSTRAINT "Medicine_pkey" PRIMARY KEY ("id")
 );
@@ -92,6 +95,8 @@ CREATE TABLE "PatientCondition" (
     "status" "PatientConditionStatus" NOT NULL,
     "startDate" TIMESTAMP(3) NOT NULL,
     "endDate" TIMESTAMP(3),
+    "hospitalId" INTEGER NOT NULL,
+    "doctorId" INTEGER,
     "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
     "updatedAt" TIMESTAMP(3) NOT NULL,
 
@@ -141,7 +146,7 @@ CREATE UNIQUE INDEX "Hospital_helplineNumber_key" ON "Hospital"("helplineNumber"
 CREATE UNIQUE INDEX "Hospital_userId_key" ON "Hospital"("userId");
 
 -- CreateIndex
-CREATE UNIQUE INDEX "Medicine_brandName_genericName_Manufacturer_dosageStrength__key" ON "Medicine"("brandName", "genericName", "Manufacturer", "dosageStrength", "dosageForm");
+CREATE UNIQUE INDEX "Medicine_brandName_genericName_manufacturer_dosageStrength__key" ON "Medicine"("brandName", "genericName", "manufacturer", "dosageStrength", "dosageForm");
 
 -- CreateIndex
 CREATE UNIQUE INDEX "Patient_mobileNumber_key" ON "Patient"("mobileNumber");
@@ -160,6 +165,12 @@ ALTER TABLE "PatientCondition" ADD CONSTRAINT "PatientCondition_patientId_fkey" 
 
 -- AddForeignKey
 ALTER TABLE "PatientCondition" ADD CONSTRAINT "PatientCondition_diseaseId_fkey" FOREIGN KEY ("diseaseId") REFERENCES "Disease"("id") ON DELETE CASCADE ON UPDATE CASCADE;
+
+-- AddForeignKey
+ALTER TABLE "PatientCondition" ADD CONSTRAINT "PatientCondition_hospitalId_fkey" FOREIGN KEY ("hospitalId") REFERENCES "Hospital"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
+
+-- AddForeignKey
+ALTER TABLE "PatientCondition" ADD CONSTRAINT "PatientCondition_doctorId_fkey" FOREIGN KEY ("doctorId") REFERENCES "Doctor"("id") ON DELETE SET NULL ON UPDATE CASCADE;
 
 -- AddForeignKey
 ALTER TABLE "MedicineAllotted" ADD CONSTRAINT "MedicineAllotted_patientId_fkey" FOREIGN KEY ("patientId") REFERENCES "Patient"("id") ON DELETE CASCADE ON UPDATE CASCADE;
