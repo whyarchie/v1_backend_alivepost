@@ -25,5 +25,7 @@ export const COMMON_ERROR= {
   DESCRIPTION_TOO_LONG: "Description too long",
   ENDDATE_BEFORE_START: "End date cannot be before start date",
   FOREIGN_KEY_CONSTRAINT: "Foreign Key Contraint Error",
-  ID_NOT_FOUND: "ID not found / Passed"
+  ID_NOT_FOUND: "ID not found / Passed",
+  INVALID_HOSPITAL: "Invalid Hospital",
+  INVALID_DOCTOR: "Invalid Doctor"
 }

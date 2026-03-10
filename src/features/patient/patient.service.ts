@@ -48,8 +48,8 @@ export async function LoginPatient(data: PatientLoginInput) {
 //Delete Patient service
 
 export async function DeletePatientService(id: number | undefined) {
-  if(!id){
-    throw new AppError(COMMON_ERROR.ID_NOT_FOUND,404)
+  if (!id) {
+    throw new AppError(COMMON_ERROR.ID_NOT_FOUND, 404);
   }
   try {
     const patient = await prisma.patient.delete({
@@ -101,42 +101,53 @@ export async function MedicalHistoryCreateService(data: MedicalHistoryCreate) {
     throw error;
   }
 }
-export async function PatientConditionCreate({id , data}:{id:number , data : PatientConditionInput}){
+export async function PatientConditionCreate(data: PatientConditionInput) {
   try {
-    
     const patientCondition = await prisma.patientCondition.create({
-      data:{
-        patientId: id,
+      data: {
+        patientId: data.patientId,
+        hospitalId: data.hospitalId,
+        doctorId: data.doctorId,
         diseaseId: data.diseaseId,
         startDate: data.startDate,
         endDate: data.endDate,
-        status: data.status
-      }
-    })
-    return patientCondition
+        status: data.status,
+      },
+    });
+    return patientCondition;
   } catch (error) {
-     if (
-    typeof error === "object" &&
-    error !== null &&
-    "code" in error
-  ) {
+    if (typeof error === "object" && error !== null && "code" in error) {
+      const prismaError = error as {
+        code?: string;
+        meta?: { field_name?: string };
+      };
 
-    const prismaError = error as { code?: string; meta?: any };
+      if (prismaError.code === "P2003") {
+        const field = prismaError.meta?.field_name;
 
-    if (prismaError.code === "P2003") {
-      const field = prismaError.meta?.field_name;
+        if (field?.includes("patientId")) {
+          throw new AppError(PATIENT_ERRORS.INVALID_PATIENT, 404);
+        }
 
-      if (field?.includes("patientId")) {
-        throw new AppError(PATIENT_ERRORS.INVALID_PATIENT, 404);
+        if (field?.includes("diseaseId")) {
+          throw new AppError(COMMON_ERROR.INVALID_DISEASE, 404);
+        }
+
+        if (field?.includes("doctorId")) {
+          throw new AppError(COMMON_ERROR.INVALID_DOCTOR, 404);
+        }
+
+        if (field?.includes("hospitalId")) {
+          throw new AppError(COMMON_ERROR.INVALID_HOSPITAL, 404);
+        }
       }
 
-      if (field?.includes("diseaseId")) {
-        throw new AppError(COMMON_ERROR.INVALID_DISEASE, 404);
-      }
+      throw new AppError(
+        "Database error while creating patient condition",
+        500,
+      );
     }
 
-  }
-
-  throw error;
+    throw error;
   }
 }

@@ -16,6 +16,7 @@ import {
   PatientConditionCreate,
 } from "./patient.service";
 import { AuthUser } from "../../middleware/Auth";
+import { COMMON_ERROR, PATIENT_ERRORS } from "../../constants/messages";
 const patientRouter = express.Router();
 
 patientRouter.post("/create", async (req, res, next) => {
@@ -80,44 +81,22 @@ patientRouter.post("/medicalhistorycreate", async (req, res, next) => {
 //Create Patient Condition
 patientRouter.post("/condition", AuthUser, async (req, res, next) => {
   try {
-    const data = req.body;
+    let data = req.body;
     const user = req.user;
-
     // Validate input data
     const safeData = PatientConditionSchema.parse(data);
-
-    // Determine patient ID based on user role
-    let patientId: number | null = null;
-    if (user?.role === "Patient") {
-      patientId = user.id;
-    } else if (user?.role === "Hospital" || user?.role === "Doctor") {
-      patientId = safeData.patientId;
-    } else {
-      return res.status(403).json({
-        success: false,
-        message: "Unauthorized: Invalid user role",
-      });
+    const payload = {
+      ...safeData,
+      [`${user?.role.toLowerCase()}Id`]:user?.id
     }
-
-    // Ensure patientId is valid
-    if (!patientId) {
-      return res.status(400).json({
-        success: false,
-        message: "Invalid patient ID",
-      });
-    }
-
-    // Create patient condition
-    const patientCondition = await PatientConditionCreate({
-      id: patientId,
-      data: safeData, // Pass safeData as `data` instead of `safeData`
-    });
-
+    const patientCondition = await PatientConditionCreate(payload)
     // Success response
     res.status(201).json({
       success: true,
       data: patientCondition,
     });
+
+  
   } catch (error) {
     next(error);
   }
