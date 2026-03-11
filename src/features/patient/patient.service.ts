@@ -1,4 +1,3 @@
-import jwt from "jsonwebtoken";
 import prisma from "../../config/prisma";
 import type {
   MedicalHistoryCreate,
@@ -8,6 +7,7 @@ import type {
 } from "./patient.schema";
 import { COMMON_ERROR, error, PATIENT_ERRORS } from "../../constants/messages";
 import { AppError } from "../../utils/AppError";
+import jwtTokenSigner from "../../utils/jwttokensigner";
 
 export async function CreatePatient(data: PatientInput) {
   const patient = await prisma.patient.upsert({
@@ -35,13 +35,11 @@ export async function LoginPatient(data: PatientLoginInput) {
   if (patient.dateOfBirth.toISOString() !== data.dateOfBirth.toISOString()) {
     throw new AppError(error.INVALID_CREDENTIALS, 401);
   }
-  const token = jwt.sign(
-    { id: patient.id, role: "Patient" },
-    process.env.JWT_SECRET!,
-    {
-      expiresIn: "30d",
-    },
-  );
+  const user = {
+    id:patient.id,
+    role: "Patient"
+  }
+  const token = jwtTokenSigner(user)
   return { patient, token };
 }
 

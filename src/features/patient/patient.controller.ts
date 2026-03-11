@@ -39,7 +39,7 @@ patientRouter.post("/login", async (req, res, next) => {
     const patient = await LoginPatient(safeData);
     res.status(200).cookie("token", patient.token).json({
       success: true,
-      data: patient,
+      data: patient.patient,
     });
   } catch (error) {
     next(error);
