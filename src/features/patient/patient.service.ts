@@ -221,3 +221,25 @@ export async function AssignMedicine(data: AssignMedicineInput, user: {id:number
 
   return result
 }
+
+export async function GetAssignedMedicineForPatient(id:number){
+
+  const result = await prisma.medicineAllotted.findMany({
+    where:{
+      patientCondition:{
+        patientId:id
+      }
+    },
+    include:{
+      medicine:true,
+      timings:true,
+      patientCondition:{
+        include:{
+          disease:true
+        }
+      }
+    }
+  })
+
+  return result
+}

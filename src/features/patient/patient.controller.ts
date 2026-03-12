@@ -13,6 +13,7 @@ import {
   AssignMedicine,
   CreatePatient,
   DeletePatientService,
+  GetAssignedMedicineForPatient,
   LoginPatient,
   MedicalHistoryCreateService,
   PatientConditionCreate,
@@ -106,10 +107,11 @@ patientRouter.post("/condition", AuthUser, async (req, res, next) => {
   }
 });
 
-patientRouter.get("/condition/:id", AuthUser, async (req, res, next) => {
+patientRouter.get("/condition/", AuthUser, async (req, res, next) => {
   try {
     const user = req.user!;
-    const id = Number(req.params.id);
+    const id = parseInt(req.query.id as string)
+    
 
     if (!id) {
       throw new AppError("Invalid condition id", 400);
@@ -144,5 +146,23 @@ patientRouter.post("/condition/medicine", AuthUser, async (req, res, next) => {
   } catch (error) {
     next(error)
   }
+})
+patientRouter.get('/condition/assignedmedicine', AuthUser, async (req , res , next )=>{
+  try{
+
+    const user = req.user;
+    if(user?.role!=="Patient"){
+      throw new AppError(COMMON_ERROR.INVALID_ROLE, 403)
+    }
+    const medicine = await GetAssignedMedicineForPatient(user.id)
+    res.status(200).json({
+      success: true,
+      data: medicine
+    })
+  }catch(error){
+    console.log(1)
+    next(error)
+  }
+  
 })
 export default patientRouter;
