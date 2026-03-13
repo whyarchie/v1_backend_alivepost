@@ -14,6 +14,7 @@ model Hospital {
 model Doctor {
     id         Int      @id @default(autoincrement())
     name       String
+    username   String @unique
     hospitalId Int
     hospital   Hospital @relation(fields: [hospitalId], references: [id], onDelete: Cascade )
     patientConditions PatientCondition[]
